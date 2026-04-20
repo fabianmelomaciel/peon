@@ -411,7 +411,7 @@ inject_system_data($floors, $agentsRaw, $agentCount, $env, $diag);
                             <div className="flex flex-col items-center gap-4">
                                 <span className="text-[9px] text-white/20 uppercase tracking-[0.4em] font-black">Transferencia de Créditos Requerida</span>
                                 <a 
-                                    href="checkout.php"
+                                    href="http://localhost/sixlan/index.php#pricing"
                                     className="w-full py-5 rounded-2xl bg-white/[0.03] border border-white/10 text-white font-black text-[10px] uppercase tracking-[0.4em] hover:bg-[var(--gold)] hover:text-black hover:border-[var(--gold)] transition-all flex items-center justify-center gap-3 group"
                                 >
                                     <StrategicIcon name="shopping-cart" className="w-4 h-4 text-[var(--gold)] group-hover:text-black transition-colors" />

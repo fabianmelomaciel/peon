@@ -6,13 +6,13 @@
 
 define('PEON_VERSION', '1.0.0-PRO');
 
-// Financial / Payments
-define('PAY_PAL_CLIENT_ID', 'AftxB-NkFlpSYwKeXcNwMPAZ8wIujMeprnpq1lIJeajruhpDzbgUIWNazMb-uqUOYd-eLSoYdUuS8vml');
-define('PAY_PAL_CURRENCY', 'USD');
-define('PEON_PLAN_PRICE', '49.99');
+// Financial / Payments (Logic centralized in Sixlan Hub)
+define('PAY_PAL_CLIENT_ID', getenv('PAY_PAL_CLIENT_ID') ?: '');
+define('PAY_PAL_CURRENCY', getenv('PAY_PAL_CURRENCY') ?: 'USD');
+define('PEON_PLAN_PRICE', getenv('PEON_PLAN_PRICE') ?: '49.99');
 
 // Security & Vault
-define('VAULT_PEPPER', 'peon_tactical_pepper_2026');
+define('VAULT_PEPPER', getenv('VAULT_PEPPER') ?: 'peon_tactical_fallback_pepper');
 
 // Remote Hub
 if (isset($_SERVER['HTTP_HOST']) && strpos($_SERVER['HTTP_HOST'], 'sixlan.com') !== false) {
