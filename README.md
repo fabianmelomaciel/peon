@@ -8,7 +8,7 @@ PEON is a high-performance **Strategic Operations Dashboard** designed to orches
 
 ## 🛰️ System Architecture
 
-PEON organizes 16 specialized agents across 5 Strategic Sectors:
+PEON organizes 17 specialized agents across 5 Strategic Sectors:
 
 - **Sector 5 (Intelligence):** Deep logic, connectivity protocols, and audit units.
 - **Sector 4 (Visual Ops):** Brand identity, aesthetic deployment, and elite design.
@@ -18,27 +18,52 @@ PEON organizes 16 specialized agents across 5 Strategic Sectors:
 
 ---
 
-## 🚀 Adaptive Deployment Protocol
+## 📦 What's Included (Open Source Core)
 
-Peon is designed to be "Clone & Run". The system identifies your environment autonomously.
+This repository contains the **Peon Dashboard** — the command center for managing your AI agents and local projects:
+
+- ✅ Adaptive environment discovery (Laragon, WAMP, XAMPP, Linux, macOS)
+- ✅ Project scanner & management panel
+- ✅ FTP/Database synchronization engine
+- ✅ AES-256 encrypted credential vault
+- ✅ Multi-language UI (English, Spanish, Portuguese)
+- ✅ Agent hierarchy visualization
+
+> **⚠️ Skills are NOT included in this repository.** The specialized AI agent skills (17 tactical units) are premium content delivered exclusively through the [Sixlan Hub](https://sixlan.com).
+
+---
+
+## 🔐 How Skills Installation Works
+
+1. **Get your license** at [sixlan.com](https://sixlan.com)
+2. **Activate the key** in your Peon Dashboard (GET LICENSE button)
+3. **Click "Install Pack"** in the System Hub panel
+4. **Peon automatically downloads** the skill pack from the Sixlan Hub
+5. **Skills are installed** directly to your local Antigravity environment (`~/.gemini/antigravity/skills/`)
+6. **Ready to use** — all 17 agents become operational immediately
+
+The installation path is **dynamically detected** based on your OS and user profile. No manual configuration needed.
+
+---
+
+## 🚀 Quick Start
 
 ### 1. Prerequisites
 - [VS Code](https://code.visualstudio.com/) + [Antigravity Extension](https://marketplace.visualstudio.com/items?itemName=Google.antigravity)
 - A local PHP server environment (Laragon, WAMP, or XAMPP)
-- Gemini Pro API key configured in your AI environment.
 
-### 2. Fast Installation
-Clone the repository into your web root (e.g., `C:/laragon/www/peon` or `/var/www/html/peon`):
+### 2. Installation
+Clone the repository into your web root:
 ```bash
 git clone https://github.com/fabianmelomaciel/peon
 ```
 
-### 3. Automatic Initialization
-Access `http://localhost/peon/index.php` in your browser.  
-The system will automatically initialized.
+### 3. Launch
+Access `http://localhost/peon/` in your browser.  
+The system initializes automatically — no configuration required.
 
-### 4. Manual Configuration (Optional)
-If the `.env` file is not created automatically due to folder permissions, create it manually in the root:
+### 4. Optional Configuration
+Create a `.env` file in the root if needed:
 ```env
 CEO_NAME="YOUR_NAME"
 # Optional overrides
@@ -50,25 +75,26 @@ CEO_NAME="YOUR_NAME"
 
 ## 🛠️ Tactical Maintenance
 
-- **Scan Network:** Use the "ESCANEAR RED WWW" button to synchronize your local project ecosystem.
-- **Vault Security:** All sensitive project data (FTP/DB) is encrypted using AES-256-CBC via the internal **PeonVault**.
-- **Skill Sync:** Ensure your `skills/` directory is mapped to your Antigravity environment for full agent deployment.
+- **Scan Network:** Synchronize your local project ecosystem from the Projects panel.
+- **Vault Security:** All sensitive data (FTP/DB credentials) is encrypted using AES-256-CBC via **PeonVault**.
+- **Skill Sync:** Premium skills are delivered as a ZIP and extracted automatically to your Antigravity environment.
 
 ---
 
-## 🚀 Upgrade to Sixlan Pro (Tactical Panel)
+## 🚀 Sixlan Pro — Full Tactical Ecosystem
 
-While **Peon Core** provides the foundational intelligence, the **Sixlan Strategic Hub** offers the professional tactical interface for enterprise operations:
+Visit [sixlan.com](https://sixlan.com) to unlock:
 
-- **Visual Dashboard:** Managed React interface with mission-critical HUD.
-- **Remote Synchronization:** Integrated FTP/DB Push and Pull protocols.
-- **DRM & Multi-project Vault:** Advanced encryption for sensitive production data.
-- **Auto-deployment:** Direct synchronization with Hostinger and GitHub.
-
-Visit [sixlan.com](https://sixlan.com) to acquire your **Lifetime Digital Signature** and unlock the full tactical ecosystem.
+- 🧠 **17 Specialized AI Agents** — From code generation to executive presentations
+- 🔄 **Remote Synchronization** — Integrated FTP/DB Push and Pull protocols
+- 🔐 **Multi-project Vault** — Enterprise-grade encryption for production data
+- 📊 **Strategic Dashboard** — Mission-critical HUD with real-time telemetry
+- ♾️ **Lifetime License** — One payment, unlimited updates
 
 ---
 
 ## 📄 License & Credits
-**MIT License.** Forged for universal strategic empowerment and mission-critical efficiency.  
-*Operational lead via Orquestador Maestro. Tactical aesthetics via Forjador de Apps.*
+**MIT License** — Dashboard core is free and open source.  
+**Premium Skills** — Delivered via [Sixlan Hub](https://sixlan.com) with active license.
+
+*Forged for universal strategic empowerment and mission-critical efficiency.*

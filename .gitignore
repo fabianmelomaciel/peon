@@ -12,6 +12,7 @@ tmp/
 .agent/
 .agents/
 scratch/
+code/skills/
 
 # Ignorar archivos de sistema de SO
 .DS_Store
