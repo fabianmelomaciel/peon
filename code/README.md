@@ -30,15 +30,12 @@ Peon is designed to be "Clone & Run". The system identifies your environment aut
 ### 2. Fast Installation
 Clone the repository into your web root (e.g., `C:/laragon/www/peon` or `/var/www/html/peon`):
 ```bash
-git clone https://github.com/FabianMelo/peon
+git clone https://github.com/fabianmelomaciel/peon
 ```
 
 ### 3. Automatic Initialization
-Access `http://localhost/peon` in your browser.  
-The system will automatically:
-- Detect your OS and home directory.
-- Initialize a local `.env` configuration.
-- Map the projects in your server root.
+Access `http://localhost/peon/index.php` in your browser.  
+The system will automatically initialized.
 
 ### 4. Manual Configuration (Optional)
 If the `.env` file is not created automatically due to folder permissions, create it manually in the root:

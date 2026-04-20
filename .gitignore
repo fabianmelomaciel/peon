@@ -5,11 +5,20 @@
 # Bloquear TODO el contenido comercial (Dashboard, PHP, Assets)
 /*
 #SLX-MAESTRO-GODMODE
-# 🚀 EXCEPCIONES OPEN SOURCE (Permitir el Núcleo IA)
+# 🚀 EXCEPCIONES OPEN SOURCE (Permitir el Núcleo y el Dashboard)
+!/assets/
+!/lang/
 !/code/
-!/.gitignore
+!/index.php
+!/header.php
+!/dashboard.php
+!/hierarchy.php
+!/checkout.php
+!/projects_sync.php
+!/PEON.md
 !/README.md
 !/LICENSE
+!/.gitignore
 
 # Reglas internas para /code/ (Ignorar temporales del IA)
 /code/.env

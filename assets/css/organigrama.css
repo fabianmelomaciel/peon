@@ -1,0 +1,190 @@
+/* Organigrama Táctico - Estilos Exclusivos */
+
+.org-viewport {
+    position: relative;
+    padding: 4rem 2rem;
+    min-height: 800px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    overflow: visible; /* Wires need to bleed out */
+}
+
+/* Hide potential global scroll indicators that float weirdly */
+.scroll-down-icon, .mouse-scroll, .scroll-indicator {
+    display: none !important;
+}
+
+.org-connectors {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 0;
+    overflow: visible;
+}
+
+.org-path {
+    fill: none;
+    stroke: rgba(255, 179, 0, 0.08);
+    stroke-width: 1.5;
+    stroke-linecap: round;
+    transition: all 1s cubic-bezier(0.16, 1, 0.3, 1);
+    stroke-dasharray: 1000;
+    stroke-dashoffset: 1000;
+    animation: drawPath 2s forwards;
+}
+
+@keyframes drawPath {
+    to { stroke-dashoffset: 0; }
+}
+
+.org-path.active {
+    stroke: var(--gold);
+    stroke-width: 2.5;
+    filter: drop-shadow(0 0 15px rgba(255, 179, 0, 0.3));
+    opacity: 0.8;
+}
+
+.data-pulse {
+    stroke-dasharray: 8, 200;
+    stroke-dashoffset: 0;
+    animation: pulseFlow 6s linear infinite;
+    stroke: var(--gold);
+    stroke-width: 3.5;
+    opacity: 0.4;
+}
+
+@keyframes pulseFlow {
+    to { stroke-dashoffset: -208; }
+}
+
+.org-node-container {
+    position: relative;
+    z-index: 10;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.org-card {
+    background: rgba(5, 5, 10, 0.6);
+    backdrop-filter: blur(40px);
+    -webkit-backdrop-filter: blur(40px);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 32px;
+    padding: 2.5rem;
+    width: 280px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+    box-shadow: 0 30px 60px rgba(0,0,0,0.5);
+}
+
+.org-card:hover {
+    transform: translateY(-15px);
+    border-color: var(--gold);
+    background: rgba(13, 14, 26, 0.8);
+    box-shadow: 0 40px 80px rgba(0,0,0,0.8), 0 0 20px rgba(255, 179, 0, 0.1);
+}
+
+.org-card.ceo {
+    width: 380px;
+    padding: 3.5rem;
+    border: 2px solid var(--gold);
+    background: radial-gradient(circle at center, rgba(255, 179, 0, 0.15), transparent);
+    margin-bottom: 5rem;
+}
+
+.org-avatar {
+    width: 80px;
+    height: 80px;
+    border-radius: 24px;
+    border: 2px solid var(--gold);
+    margin-bottom: 1.5rem;
+    padding: 6px;
+    background: #000;
+    box-shadow: 0 10px 20px rgba(0,0,0,0.5);
+}
+
+.org-label {
+    font-size: 8px;
+    font-weight: 900;
+    letter-spacing: 0.4em;
+    text-transform: uppercase;
+    margin-bottom: 0.8rem;
+    color: var(--gold);
+    opacity: 0.5;
+}
+
+/* Floor Themes - Standardized Palette */
+.floor-piso-1 { --floor-color: #0ea5e9; }
+.floor-piso-2 { --floor-color: #f59e0b; }
+.floor-piso-3 { --floor-color: #8b5cf6; }
+.floor-piso-4 { --floor-color: #10b981; }
+.floor-piso-5 { --floor-color: #ef4444; }
+
+.org-card.department {
+    border-top: 4px solid var(--floor-color);
+    padding-top: 3rem;
+}
+
+.org-card.department:hover {
+    box-shadow: 0 40px 80px -20px rgba(0,0,0,0.9), 0 0 40px rgba(var(--floor-color), 0.15);
+}
+
+.agent-satellites {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    margin-top: 2rem;
+    width: 100%;
+}
+
+.agent-sat {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 16px;
+    padding: 0.75rem 1.25rem;
+    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    cursor: pointer;
+}
+
+.agent-sat:hover {
+    background: var(--floor-color);
+    color: #000 !important;
+    transform: scale(1.05) translateX(10px);
+    border-color: var(--floor-color);
+}
+
+.agent-sat:hover * {
+    color: #000 !important;
+}
+
+.org-name {
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 800;
+    color: white;
+    font-size: 1.2rem;
+    letter-spacing: -0.02em;
+}
+
+.station-glow {
+    position: absolute;
+    inset: -30px;
+    background: radial-gradient(circle at center, var(--floor-color), transparent 70%);
+    opacity: 0;
+    transition: opacity 0.8s;
+    pointer-events: none;
+    z-index: -1;
+}
+
+.org-card:hover .station-glow {
+    opacity: 0.15;
+}
+
