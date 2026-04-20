@@ -140,9 +140,9 @@
          */
         const StrategicIcon = ({ name, className = "w-4 h-4", color = "currentColor" }) => {
             const iconRef = useRef(null);
-            // Normalización para evitar fallos por mayúsculas (ej: Github -> github -> terminal)
+            // Normalización: 1) buscar en mapa por nombre normalizado, 2) por nombre original, 3) usar nombre directo de Lucide
             const normalizedName = (name || '').toLowerCase();
-            const iconName = ICON_MAP[normalizedName] || ICON_MAP[name] || 'info'; 
+            const iconName = ICON_MAP[normalizedName] || ICON_MAP[name] || normalizedName || 'info'; 
             
             useEffect(() => {
                 if (iconRef.current && window.lucide) {
