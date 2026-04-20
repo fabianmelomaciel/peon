@@ -2,28 +2,28 @@
 # 🛡️ PEON: RESTRICCIÓN DE PROPIEDAD INTELECTUAL
 # ═══════════════════════════════════════
 
-# Bloquear TODO el contenido comercial (Dashboard, PHP, Assets)
+# Ignorar archivos sensibles y temporales
+.env
+.peon_env
+backups/
+tmp/
+*.log
+.agent/
+.agents/
+scratch/
+
+# Ignorar archivos de sistema de SO
+.DS_Store
+Thumbs.db
+
+# Permitir todo lo demás (Dashboard, Logic, Assets, README)
 /*
-#SLX-MAESTRO-GODMODE
-# 🚀 EXCEPCIONES OPEN SOURCE (Permitir el Núcleo y el Dashboard)
 !/assets/
 !/lang/
 !/code/
-!/index.php
-!/header.php
-!/dashboard.php
-!/hierarchy.php
-!/checkout.php
-!/projects_sync.php
-!/PEON.md
-!/README.md
+!/*.php
+!/*.md
+!/*.json
 !/LICENSE
 !/.gitignore
-
-# Reglas internas para /code/ (Ignorar temporales del IA)
-/code/.env
-/code/tmp/
-/code/backups/
-/code/*.log
-/code/.agent/
-/code/.agents/
+!/.htaccess
