@@ -123,8 +123,8 @@
             'presentador-ejecutivo': 'tv',
             'maestro-de-arte-ia': 'sparkles',
             'algorithmic-art': 'sparkles',
-            'github': 'github',
-            'linkedin': 'linkedin',
+            'github': 'terminal',
+            'linkedin': 'user-check',
             'peon': 'star',
             'canvas-design': 'image',
             'doc-coauthoring': 'users',
@@ -140,7 +140,9 @@
          */
         const StrategicIcon = ({ name, className = "w-4 h-4", color = "currentColor" }) => {
             const iconRef = useRef(null);
-            const iconName = ICON_MAP[name] || name;
+            // Normalización para evitar fallos por mayúsculas (ej: Github -> github -> terminal)
+            const normalizedName = (name || '').toLowerCase();
+            const iconName = ICON_MAP[normalizedName] || ICON_MAP[name] || 'info'; 
             
             useEffect(() => {
                 if (iconRef.current && window.lucide) {
@@ -148,13 +150,17 @@
                     const i = document.createElement('i');
                     i.setAttribute('data-lucide', iconName);
                     iconRef.current.appendChild(i);
-                    window.lucide.createIcons({
-                        attrs: { 
-                            class: className,
-                            stroke: color
-                        },
-                        nameAttr: 'data-lucide'
-                    });
+                    try {
+                        window.lucide.createIcons({
+                            attrs: { 
+                                class: className,
+                                stroke: color
+                            },
+                            nameAttr: 'data-lucide'
+                        });
+                    } catch (e) {
+                        console.warn("Lucide render failed for:", iconName);
+                    }
                 }
             }, [iconName, className, color]);
 

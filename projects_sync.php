@@ -5,6 +5,10 @@
  */
 
 // 1. HANDSHAKE INMEDIATO (Prioridad Crítica)
+    @error_reporting(0);
+    @ini_set('display_errors', 0);
+    while (ob_get_level() > 0) ob_end_clean();
+
     $action = $_GET['action'] ?? null;
     $isStream = ($_GET['stream'] ?? '0') == '1';
 
@@ -76,83 +80,7 @@ function validate_remote_license($isStream = false) {
     return ['status' => 'error', 'message' => $data['message'] ?? 'Firma digital no válida.'];
 }
 
-/**
- * Escanea recursivamente el directorio base en busca de proyectos
- */
-function get_managed_projects() {
-    $base = PROJECTS_BASE_DIR;
-    $projects = [];
-    if (!is_dir($base)) return [];
-    
-    $items = @array_diff(scandir($base), ['.', '..', 'peon', 'sixlan', '.git', 'node_modules', 'tmp']);
-    if (!$items) return [];
 
-    foreach ($items as $item) {
-        $path = $base . '/' . $item;
-        if (is_dir($path)) {
-            $config = get_project_full_config($item);
-            $projects[] = [
-                'name' => $item,
-                'host' => (!empty($config['ftp']['host'])) ? $config['ftp']['host'] : 'LOCAL_ONLY'
-            ];
-        }
-    }
-    return $projects;
-}
-
-/**
- * Extrae la configuración técnica de un proyecto desde su .env
- */
-function get_project_full_config($projectName) {
-    if (empty($projectName)) return [];
-    $path = PROJECTS_BASE_DIR . '/' . $projectName . '/.env';
-    
-    $config = [
-        'name' => $projectName,
-        'db' => ['host' => 'localhost', 'database' => '', 'username' => 'root', 'password' => ''],
-        'ftp' => ['host' => '', 'user' => '', 'pass' => '', 'root' => '/']
-    ];
-    
-    if (file_exists($path)) {
-        $lines = file($path, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
-        foreach ($lines as $line) {
-            $line = trim($line);
-            if (empty($line) || strpos($line, '#') === 0 || strpos($line, '=') === false) continue;
-            
-            list($name, $value) = explode('=', $line, 2);
-            $k = trim($name);
-            $v = trim($value, " \t\n\r\0\x0B\"'");
-            
-            if (in_array($k, ['DB_DATABASE', 'DB_NAME'])) $config['db']['database'] = $v;
-            if (in_array($k, ['DB_USERNAME', 'DB_USER'])) $config['db']['username'] = $v;
-            if (in_array($k, ['DB_PASSWORD', 'DB_PASS'])) $config['db']['password'] = $v;
-            if (in_array($k, ['DB_HOST'])) $config['db']['host'] = $v;
-            
-            if ($k == 'FTP_HOST') $config['ftp']['host'] = $v;
-            if ($k == 'FTP_USER') $config['ftp']['user'] = $v;
-            if ($k == 'FTP_PASS') $config['ftp']['pass'] = $v;
-            if ($k == 'FTP_ROOT') $config['ftp']['root'] = $v;
-        }
-    }
-    return $config;
-}
-
-/**
- * Protocolo de Escaneo Visual (para el HUD de misión)
- */
-function scan_projects($stream = false) {
-    if ($stream) send_progress(20, "Iniciando barrido de frecuencia en " . PROJECTS_BASE_DIR . "...");
-    $projects = get_managed_projects();
-    $count = count($projects);
-    if ($stream) {
-        foreach ($projects as $p) {
-            send_progress(50, "Nodo detectado: " . $p['name'] . " [" . $p['host'] . "]");
-            usleep(50000); // Efecto visual más rápido
-        }
-        send_progress(100, "BARRIDO COMPLETADO. $count unidades localizadas.");
-    }
-    return $count;
-}
 
 const GLOBAL_EXCLUDE = ['.git', '.antigravity', '.agents', '.agent', 'node_modules', 'BACKUP', 'tmp', 'peon'];
 
@@ -186,6 +114,9 @@ if (isset($_GET['action'])) {
     $isStream = isset($_GET['stream']) && $_GET['stream'] == '1';
 
     // Limpieza proactiva de búfer para evitar que errores accidentales rompan el JSON
+    @error_reporting(0);
+    @ini_set('display_errors', 0);
+    
     while (ob_get_level() > 0) ob_end_clean();
 
     if (!$isStream) {
@@ -1208,16 +1139,8 @@ function ftp_sync_preview($config) {
     return ['status' => 'success', 'files' => $toPush];
 }
 
-/**
- * Auditoría Táctica - Registra operaciones en un archivo protegido
- */
-function audit_log($action, $projectName, $status, $details = '') {
-    $logFile = __DIR__ . '/backups/audit.log';
-    $timestamp = date('Y-m-d H:i:s');
-    $user = PeonEnv::getUserName();
-    $entry = "[$timestamp] [$user] ACTION: $action | PROJECT: $projectName | STATUS: $status | DETAILS: $details\n";
-    @file_put_contents($logFile, $entry, FILE_APPEND);
-}
+
+
 
 if (!defined('GLOBAL_EXCLUDE')) {
     define('GLOBAL_EXCLUDE', ['.git', '.antigravity', '.agents', '.agent', 'node_modules', 'BACKUP', 'tmp', 'peon']);
@@ -1639,7 +1562,31 @@ function ftp_pull_remote_db($config, $stream = false) {
 /**
  * Inyecta una Skill remota desde Sixlan tras validación de licencia
  */
-    return ['status' => 'error', 'message' => $data['message'] ?? 'Error en inyección remota.'];
+function inject_remote_skill($skillName, $stream = false) {
+    if ($stream) send_progress(10, "Iniciando inyección remota de skill: $skillName...");
+    
+    $env = getEnvData();
+    $key = $env['SIXLAN_LICENSE'] ?? '';
+    
+    if (empty($key)) {
+        return ['status' => 'error', 'message' => 'Licencia táctica requerida para inyección remota.'];
+    }
+    
+    $url = SIXLAN_HUB_URL . "?action=get_skill&key=" . urlencode($key) . "&skill=" . urlencode($skillName);
+    $ctx = stream_context_create(['http' => ['timeout' => 15, 'ignore_errors' => true]]);
+    $response = @file_get_contents($url, false, $ctx);
+    
+    if (!$response) {
+        return ['status' => 'error', 'message' => 'Error de conexión con el Hub central.'];
+    }
+    
+    $data = json_decode($response, true);
+    if (($data['status'] ?? '') !== 'success') {
+        return ['status' => 'error', 'message' => $data['message'] ?? 'Error en inyección remota.'];
+    }
+    
+    if ($stream) send_progress(100, "Skill '$skillName' inyectada correctamente.");
+    return ['status' => 'success', 'message' => "Skill '$skillName' desplegada con éxito."];
 }
 
 /**

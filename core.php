@@ -62,4 +62,18 @@ function inject_system_data($floors, $agentsRaw, $agentCount, $env, $diag) {
     </script>
     <?php
 }
+
+/**
+ * Registra eventos tácticos en el log del sistema
+ */
+function audit_log($action, $projectName, $status, $details = '') {
+    $logDir = __DIR__ . '/backups';
+    if (!is_dir($logDir)) @mkdir($logDir, 0777, true);
+    $logFile = $logDir . '/audit.log';
+    $timestamp = date('Y-m-d H:i:s');
+    $user = PeonEnv::getUserName();
+    $entry = "[$timestamp] [$user] ACTION: $action | PROJECT: $projectName | STATUS: $status | DETAILS: $details\n";
+    @file_put_contents($logFile, $entry, FILE_APPEND);
+}
+
 ?>

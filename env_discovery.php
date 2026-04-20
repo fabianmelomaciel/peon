@@ -44,7 +44,7 @@ class PeonEnv {
         // Check if Docker is available
         $dockerCheck = ($os === 'Windows') ? @shell_exec('where docker 2>nul') : @shell_exec('which docker 2>/dev/null');
         $env['docker_installed'] = !empty($dockerCheck);
-        $env['is_container'] = file_exists('/.dockerenv') || @file_exists('/proc/self/cgroup') && @strpos(file_get_contents('/proc/self/cgroup'), 'docker') !== false;
+        $env['is_container'] = @file_exists('/.dockerenv') || @file_exists('/proc/self/cgroup') && @strpos(@file_get_contents('/proc/self/cgroup'), 'docker') !== false;
 
         if ($os === 'Windows') {
             self::probeWindows($env);
@@ -78,8 +78,8 @@ class PeonEnv {
                 if ($type === 'Laragon') {
                     $env['root'] = "$base/www";
                     $mysqlBase = "$base/bin/mysql";
-                    if (is_dir($mysqlBase)) {
-                        $versions = array_diff(scandir($mysqlBase), ['.', '..']);
+                    if (@is_dir($mysqlBase)) {
+                        $versions = @array_diff(@scandir($mysqlBase), ['.', '..']);
                         rsort($versions);
                         foreach ($versions as $v) {
                             $bin = "$mysqlBase/$v/bin";
@@ -94,8 +94,8 @@ class PeonEnv {
                 } elseif ($type === 'WAMP') {
                     $env['root'] = "$base/www";
                     $mysqlBase = "$base/bin/mysql";
-                    if (is_dir($mysqlBase)) {
-                        $versions = array_diff(scandir($mysqlBase), ['.', '..']);
+                    if (@is_dir($mysqlBase)) {
+                        $versions = @array_diff(@scandir($mysqlBase), ['.', '..']);
                         rsort($versions);
                         foreach ($versions as $v) {
                              $bin = "$mysqlBase/$v/bin";
