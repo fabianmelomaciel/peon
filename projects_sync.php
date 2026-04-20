@@ -1623,7 +1623,9 @@ function install_intelligence_pack($stream = false) {
     $zip = new ZipArchive();
     $res = $zip->open($tempZip);
     if ($res === TRUE) {
-        $extractPath = __DIR__ . '/code/skills/';
+        // Extraer a la ruta real de skills de Antigravity (detectada dinámicamente)
+        $diag = PeonEnv::getDiagnostics();
+        $extractPath = $diag['skills_path'] . '/';
         if (!is_dir($extractPath)) @mkdir($extractPath, 0777, true);
         
         $zip->extractTo($extractPath);
