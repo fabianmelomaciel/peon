@@ -18,6 +18,44 @@ inject_system_data($floors, $agentsRaw, $agentCount, $env, $diag);
             AGENT_COUNT, SECTOR_COUNT 
         } = window;
 
+        const installTacticalPack = async () => {
+            if (!confirm("¿INICIAR DESPLIEGUE MASIVO DE INTELIGENCIA?\n\nEsto descargará e instalará todos los agentes especializados desde Sixlan Hub.")) return;
+            
+            const agent = { name: "SIXLAN_HUB", role: "VAULT_SYNCHRONIZER", avatar: "https://api.dicebear.com/7.x/identicon/svg?seed=HUB" };
+            const mission = { agent, type: "DEPLOY", logs: ["ESTABLECIENDO CONEXIÓN CON BÓVEDA CENTRAL..."], progress: 5, statusMsg: "CONNECTING" };
+            setActiveMission(mission);
+            
+            try {
+                const response = await fetch(`projects_sync.php?action=install_intelligence_pack&stream=1`);
+                const reader = response.body.getReader();
+                const decoder = new TextDecoder();
+                let buffer = '';
+                while (true) {
+                    const { value, done } = await reader.read();
+                    if (done) break;
+                    buffer += decoder.decode(value, { stream: true });
+                    const lines = buffer.split("\n");
+                    buffer = lines.pop();
+                    for (const line of lines) {
+                        if (!line.trim() || !line.startsWith('data: ')) continue;
+                        try {
+                            const data = JSON.parse(line.substring(6));
+                            if (data.progress !== undefined) setActiveMission(prev => ({ ...prev, progress: data.progress }));
+                            if (data.msg) setActiveMission(prev => ({ ...prev, logs: [...(prev.logs || []), data.msg].slice(-50), statusMsg: data.msg.substring(0,30) }));
+                            if (data.status === 'success') {
+                                setActiveMission(prev => ({ ...prev, progress: 100, statusMsg: "SYNC_COMPLETE" }));
+                                setTimeout(() => { setActiveMission(null); window.location.reload(); }, 2000);
+                                return;
+                            }
+                        } catch (e) {}
+                    }
+                }
+            } catch (err) {
+                console.error("Pack installation failed:", err);
+                setActiveMission(prev => ({ ...prev, statusMsg: "FAILED", logs: [...prev.logs, "FALLO CRÍTICO EN LA DESCARGA."] }));
+            }
+        };
+
         // Configuration
         const TARGET_PROJECT_NAME = "<?php echo addslashes((string)($targetProject ?? '')); ?>";
         const agents = React.useMemo(() => {
@@ -696,7 +734,7 @@ inject_system_data($floors, $agentsRaw, $agentCount, $env, $diag);
                     />
                 )}
                 {showManual && <CodexPeon t={t} lang={lang} onClose={() => setShowManual(false)} onUninstall={uninstallSystem} />}
-                {showSystemHub && <SystemHub t={t} lang={lang} setLang={setLang} onClose={() => setShowSystemHub(false)} onUninstall={uninstallSystem} />}
+                {showSystemHub && <SystemHub t={t} lang={lang} setLang={setLang} onClose={() => setShowSystemHub(false)} onUninstall={uninstallSystem} installTacticalPack={installTacticalPack} />}
                 {activeMission && <MissionHUD mission={activeMission} onToggle={() => setActiveMission(prev => ({...prev, isMinimized: !prev.isMinimized}))} onClose={() => setActiveMission(null)} t={t} />}
 
                 {view === 'db_prompt' && (

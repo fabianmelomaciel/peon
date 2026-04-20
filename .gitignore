@@ -8,6 +8,7 @@
 backups/
 tmp/
 *.log
+*.zip
 .agent/
 .agents/
 scratch/

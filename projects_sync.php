@@ -148,6 +148,9 @@ if (isset($_GET['action'])) {
                 audit_log('LICENSE_VERIFY_FAIL', 'SYSTEM', 'ERROR', "Invalid key: " . substr($key, 0, 12) . "...");
             }
             break;
+        case 'install_intelligence_pack':
+            $response = install_intelligence_pack($isStream);
+            break;
         case 'verify_license_purchase':
             $email = $_GET['email'] ?? '';
             $resData = ['status' => 'error', 'message' => 'Servidor de licencias inalcanzable.'];
@@ -1558,37 +1561,56 @@ function ftp_pull_remote_db($config, $stream = false) {
 /**
  * Inyecta una Skill remota desde Sixlan tras validación de licencia
  */
-function inject_remote_skill($skillName, $stream = false) {
-    if ($stream) send_progress(20, "Solicitando ADN de Agente para: $skillName...");
+    return ['status' => 'error', 'message' => $data['message'] ?? 'Error en inyección remota.'];
+}
+
+/**
+ * Descarga y despliega el paquete completo de inteligencia táctica (ZIP)
+ */
+function install_intelligence_pack($stream = false) {
+    if ($stream) send_progress(10, "Iniciando despliegue de arsenal de inteligencia...");
     
     $env = getEnvData();
     $key = $env['SIXLAN_LICENSE'] ?? '';
     
-    // Llamamos a la API de Sixlan (que ya protegimos en el paso anterior)
-    $url = SIXLAN_API_URL . "?action=get_skill&name=" . urlencode($skillName) . "&key=" . urlencode($key);
-    
-    $ctx = stream_context_create([
-        'http' => ['timeout' => 5, 'ignore_errors' => true]
-    ]);
-    
-    $response = @file_get_contents($url, false, $ctx);
-    if ($response === false) {
-        return ['status' => 'error', 'message' => 'Servidor de licencias inalcanzable.'];
+    if (empty($key)) {
+        return ['status' => 'error', 'message' => 'Se requiere licencia táctica activa para descargar el paquete completo.'];
     }
 
-    $data = json_decode($response, true);
+    $url = SIXLAN_HUB_URL . "?action=get_tactical_pack&key=" . urlencode($key);
+    $tempZip = __DIR__ . '/tmp_pack_' . time() . '.zip';
     
-    if (($data['status'] ?? '') === 'success') {
-        // En Peón, las skills viven en /code/skills/ (o según tu estructura)
-        $skillDir = __DIR__ . '/code/skills/' . $skillName;
-        if (!is_dir($skillDir)) @mkdir($skillDir, 0777, true);
-        
-        file_put_contents($skillDir . '/SKILL.md', $data['content']);
-        if ($stream) send_progress(100, "OPERACIÓN EXITOSA: Inteligencia inyectada para [" . $skillName . "].");
-        return ['status' => 'success', 'message' => "Skill $skillName activada con éxito."];
+    if ($stream) send_progress(30, "Conectando con Sixlan Hub y descargando paquete táctico...");
+
+    $ctx = stream_context_create(['http' => ['timeout' => 30, 'ignore_errors' => true]]);
+    $content = @file_get_contents($url, false, $ctx);
+    
+    if (!$content || strpos($content, '{"status":"error"') === 0) {
+        $msg = $content ? json_decode($content, true)['message'] : 'Error de conexión con el Hub central.';
+        return ['status' => 'error', 'message' => $msg];
     }
-    
-    return ['status' => 'error', 'message' => $data['message'] ?? 'Error en inyección remota.'];
+
+    file_put_contents($tempZip, $content);
+    unset($content); // Liberar memoria
+
+    if ($stream) send_progress(60, "Descomprimiendo unidades tácticas y habilitando sectores especializados...", 'processing');
+
+    $zip = new ZipArchive();
+    $res = $zip->open($tempZip);
+    if ($res === TRUE) {
+        $extractPath = __DIR__ . '/code/skills/';
+        if (!is_dir($extractPath)) @mkdir($extractPath, 0777, true);
+        
+        $zip->extractTo($extractPath);
+        $zip->close();
+        @unlink($tempZip);
+
+        if ($stream) send_progress(100, "DESPLIEGUE FINALIZADO: El arsenal táctico está 100% operativo.");
+        return ['status' => 'success', 'message' => 'Paquete de inteligencia instalado con éxito.'];
+    } else {
+        @unlink($tempZip);
+        return ['status' => 'error', 'message' => 'Fallo al procesar el contenedor táctico (ZIP corrupto o incompleto).'];
+    }
 }
 
 ?>

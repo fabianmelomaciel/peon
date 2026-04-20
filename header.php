@@ -252,7 +252,7 @@
             </header>
         );
 
-        const SystemHub = ({ t, lang, setLang, onClose, onUninstall }) => {
+        const SystemHub = ({ t, lang, setLang, onClose, onUninstall, installTacticalPack }) => {
             const [copied, setCopied] = useState(false);
             const getOS = () => {
                 const ua = window.navigator.userAgent;
@@ -289,6 +289,24 @@
                         </div>
 
                         <div className="space-y-12 h-[500px] overflow-y-auto custom-scrollbar pr-6">
+                            <div className="bg-white/[0.03] p-8 rounded-3xl border border-white/5">
+                                <h3 className="text-[var(--gold)] font-black text-[10px] uppercase tracking-widest mb-6">ACTUALIZACIÓN TÁCTICA</h3>
+                                <div className="flex flex-col md:flex-row items-center gap-6">
+                                    <div className="p-4 bg-[var(--gold)]/10 rounded-2xl border border-[var(--gold)]/20">
+                                         <StrategicIcon name="package" className="w-10 h-10 text-[var(--gold)]" />
+                                    </div>
+                                    <div className="flex-1">
+                                        <p className="text-white/60 text-xs leading-relaxed mb-4">Sincroniza el arsenal completo de habilidades desde Sixlan Hub. Esto descargará e instalará automáticamente el paquete de inteligencia Pro.</p>
+                                        <button 
+                                            onClick={() => { onClose(); installTacticalPack(); }}
+                                            className="w-full md:w-auto px-8 py-3 rounded-xl bg-[var(--gold)] text-[var(--obsidian)] font-black text-[10px] uppercase tracking-widest hover:scale-105 transition-all shadow-[0_0_30px_rgba(255,179,0,0.2)]"
+                                        >
+                                            DESPLEGAR ARSENAL DE INTELIGENCIA (ZIP)
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
                             <div className="bg-white/[0.03] p-8 rounded-3xl border border-white/5">
                                 <h3 className="text-[var(--gold)] font-black text-[10px] uppercase tracking-widest mb-6">{t('language_selector')}</h3>
                                 <div className="flex gap-4">
