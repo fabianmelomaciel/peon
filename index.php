@@ -47,7 +47,8 @@ inject_system_data($floors, $agentsRaw, $agentCount, $env, $diag);
         const [lang, setLangState] = React.useState(getInitialLang());
         const setLang = (l) => { storage.setItem('peon_lang', l); setLangState(l); };
         const [hasLicense, setHasLicense] = React.useState(() => {
-            return !!window.SIXLAN_LICENSE || storage.getItem('peon_license_valid') === '1';
+            const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+            return isLocal || !!window.SIXLAN_LICENSE || storage.getItem('peon_license_valid') === '1';
         });
         const [licenseKeyInput, setLicenseKeyInput] = React.useState('');
         const [checkingLicense, setCheckingLicense] = React.useState(false);
