@@ -208,33 +208,12 @@
 
                     <nav className="flex gap-2 md:gap-4 mr-2 md:mr-4 border-r border-white/10 pr-2 md:pr-4">
                         <button 
-                            onClick={() => window.location.href='checkout.php'}
-                            title="Desplegar Licencia Maestra"
+                            onClick={() => window.open('https://sixlan.com', '_blank')}
+                            title="Obtener Licencia en Sixlan"
                             className={`p-2.5 md:px-6 md:py-2 rounded-full text-[10px] font-black uppercase tracking-widest transition-all flex items-center gap-2 text-[#05050A] bg-[#FFB300] hover:scale-105 shadow-[0_0_20px_rgba(255,179,0,0.3)]`}
                         >
                             <StrategicIcon name="key" className="w-4 h-4 text-inherit" />
                             <span className="hidden sm:inline">GET LICENSE</span>
-                        </button>
-
-                        <button 
-                            onClick={async () => {
-                                if (confirm('¿Automatizar despliegue del Núcleo IA hacia GitHub Comercial?')) {
-                                    alert('Iniciando transferencia Git. Ver la consola o HUD para progreso (Simulado).');
-                                    // Aquí llamaríamos a un endpoint backend real para hacer exec('git push')
-                                    try {
-                                        let res = await fetch('projects_sync.php?action=deploy_github');
-                                        let data = await res.json();
-                                        alert(data.message || 'Despliegue finalizado.');
-                                    } catch (e) {
-                                        alert('Error lanzando despliegue autónomo.');
-                                    }
-                                }
-                            }}
-                            title="Desplegar Núcleo a GitHub"
-                            className={`p-2.5 md:px-4 md:py-2 rounded-full text-[10px] font-black uppercase tracking-widest transition-all flex items-center gap-2 text-[#00E676] bg-[#00E676]/10 hover:bg-[#00E676] hover:text-[#05050A] shadow-[0_0_15px_rgba(0,230,118,0.2)]`}
-                        >
-                            <StrategicIcon name="github" className="w-4 h-4 text-inherit" />
-                            <span className="hidden sm:inline">PUBLICAR EN GITHUB</span>
                         </button>
 
                         <button 
