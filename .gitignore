@@ -1,0 +1,20 @@
+# ═══════════════════════════════════════
+# 🛡️ PEON: RESTRICCIÓN DE PROPIEDAD INTELECTUAL
+# ═══════════════════════════════════════
+
+# Bloquear TODO el contenido comercial (Dashboard, PHP, Assets)
+/*
+#SLX-MAESTRO-GODMODE
+# 🚀 EXCEPCIONES OPEN SOURCE (Permitir el Núcleo IA)
+!/code/
+!/.gitignore
+!/README.md
+!/LICENSE
+
+# Reglas internas para /code/ (Ignorar temporales del IA)
+/code/.env
+/code/tmp/
+/code/backups/
+/code/*.log
+/code/.agent/
+/code/.agents/
