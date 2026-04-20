@@ -76,6 +76,84 @@ function validate_remote_license($isStream = false) {
     return ['status' => 'error', 'message' => $data['message'] ?? 'Firma digital no válida.'];
 }
 
+/**
+ * Escanea recursivamente el directorio base en busca de proyectos
+ */
+function get_managed_projects() {
+    $base = PROJECTS_BASE_DIR;
+    $projects = [];
+    if (!is_dir($base)) return [];
+    
+    $items = @array_diff(scandir($base), ['.', '..', 'peon', 'sixlan', '.git', 'node_modules', 'tmp']);
+    if (!$items) return [];
+
+    foreach ($items as $item) {
+        $path = $base . '/' . $item;
+        if (is_dir($path)) {
+            $config = get_project_full_config($item);
+            $projects[] = [
+                'name' => $item,
+                'host' => (!empty($config['ftp']['host'])) ? $config['ftp']['host'] : 'LOCAL_ONLY'
+            ];
+        }
+    }
+    return $projects;
+}
+
+/**
+ * Extrae la configuración técnica de un proyecto desde su .env
+ */
+function get_project_full_config($projectName) {
+    if (empty($projectName)) return [];
+    $path = PROJECTS_BASE_DIR . '/' . $projectName . '/.env';
+    
+    $config = [
+        'name' => $projectName,
+        'db' => ['host' => 'localhost', 'database' => '', 'username' => 'root', 'password' => ''],
+        'ftp' => ['host' => '', 'user' => '', 'pass' => '', 'root' => '/']
+    ];
+    
+    if (file_exists($path)) {
+        $lines = file($path, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+        foreach ($lines as $line) {
+            $line = trim($line);
+            if (empty($line) || strpos($line, '#') === 0 || strpos($line, '=') === false) continue;
+            
+            list($name, $value) = explode('=', $line, 2);
+            $k = trim($name);
+            $v = trim($value, " \t\n\r\0\x0B\"'");
+            
+            if (in_array($k, ['DB_DATABASE', 'DB_NAME'])) $config['db']['database'] = $v;
+            if (in_array($k, ['DB_USERNAME', 'DB_USER'])) $config['db']['username'] = $v;
+            if (in_array($k, ['DB_PASSWORD', 'DB_PASS'])) $config['db']['password'] = $v;
+            if (in_array($k, ['DB_HOST'])) $config['db']['host'] = $v;
+            
+            if ($k == 'FTP_HOST') $config['ftp']['host'] = $v;
+            if ($k == 'FTP_USER') $config['ftp']['user'] = $v;
+            if ($k == 'FTP_PASS') $config['ftp']['pass'] = $v;
+            if ($k == 'FTP_ROOT') $config['ftp']['root'] = $v;
+        }
+    }
+    return $config;
+}
+
+/**
+ * Protocolo de Escaneo Visual (para el HUD de misión)
+ */
+function scan_projects($stream = false) {
+    if ($stream) send_progress(20, "Iniciando barrido de frecuencia en " . PROJECTS_BASE_DIR . "...");
+    $projects = get_managed_projects();
+    $count = count($projects);
+    if ($stream) {
+        foreach ($projects as $p) {
+            send_progress(50, "Nodo detectado: " . $p['name'] . " [" . $p['host'] . "]");
+            usleep(50000); // Efecto visual más rápido
+        }
+        send_progress(100, "BARRIDO COMPLETADO. $count unidades localizadas.");
+    }
+    return $count;
+}
+
 const GLOBAL_EXCLUDE = ['.git', '.antigravity', '.agents', '.agent', 'node_modules', 'BACKUP', 'tmp', 'peon'];
 
     $isStream = ($_GET['stream'] ?? '0') == '1';
