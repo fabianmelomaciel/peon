@@ -15,19 +15,30 @@ $isStream = (($_GET['stream'] ?? '0') == '1');
 
 // 2. ERROR TRAPPING
 function hud_error_handler($errno, $errstr, $errfile, $errline) {
+    global $isStream;
     if (!(error_reporting() & $errno)) return false;
     $msg = "ERR: $errstr en $errfile:$errline";
     debug_sync("PHP_ERR: $msg");
-    echo "data: " . json_encode(['status' => 'error', 'msg' => "⚠️ " . $errstr]) . "\n\n";
+    if ($isStream) {
+        echo "data: " . json_encode(['status' => 'error', 'msg' => "⚠️ " . $errstr]) . "\n\n";
+    } else {
+        echo json_encode(['status' => 'error', 'message' => "⚠️ " . $errstr]);
+    }
     @flush(); return true;
 }
 
 function hud_fatal_handler() {
+    global $isStream;
     $error = error_get_last();
     if ($error !== NULL && ($error['type'] === E_ERROR || $error['type'] === E_PARSE || $error['type'] === E_CORE_ERROR || $error['type'] === E_COMPILE_ERROR)) {
         $msg = "FATAL: {$error['message']} en {$error['file']}:{$error['line']}";
         debug_sync($msg);
-        echo "data: " . json_encode(['status' => 'error', 'msg' => "🚫 FATAL: " . basename($error['file']) . ":" . $error['line']]) . "\n\n";
+        $payload = ['status' => 'error', 'msg' => "🚫 FATAL: " . basename($error['file']) . ":" . $error['line'], 'message' => $error['message']];
+        if ($isStream) {
+            echo "data: " . json_encode($payload) . "\n\n";
+        } else {
+            echo json_encode($payload);
+        }
         @flush();
     }
 }
@@ -99,9 +110,29 @@ if ($action) {
                 $response = ['status' => 'success', 'config' => get_project_full_config($project)];
                 break;
             case 'test_ftp':
-                $conn = @ftp_connect($_GET['host'] ?? '', 21, 10);
-                if ($conn && @ftp_login($conn, $_GET['user'] ?? '', $_GET['pass'] ?? '')) { @ftp_close($conn); $response = ['status' => 'success', 'message' => 'FTP OK']; }
-                else { $response = ['status' => 'error', 'message' => 'FTP FAIL']; }
+                $host = $_GET['host'] ?? '';
+                $user = $_GET['user'] ?? '';
+                $pass = $_GET['pass'] ?? '';
+                $port = 21;
+                
+                // Extraer puerto si el host es host:port
+                if (strpos($host, ':') !== false) {
+                    list($host, $port) = explode(':', $host);
+                }
+
+                $conn = @ftp_connect($host, $port, 10);
+                if ($conn) {
+                    if (@ftp_login($conn, $user, $pass)) {
+                        ftp_pasv($conn, true); // <--- PIEZA CLAVE: Modo Pasivo habilitado para el test
+                        @ftp_close($conn);
+                        $response = ['status' => 'success', 'message' => 'FTP CONECTADO (PASV OK)'];
+                    } else {
+                        @ftp_close($conn);
+                        $response = ['status' => 'error', 'message' => 'LOGIN FALLIDO: Usuario o clave incorrectos'];
+                    }
+                } else {
+                    $response = ['status' => 'error', 'message' => "ERROR DE CONEXIÓN: No se pudo alcanzar el host $host en puerto $port"];
+                }
                 break;
             case 'test_db':
                 try {

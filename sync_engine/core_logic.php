@@ -85,7 +85,7 @@ function get_project_full_config($projectName) {
     $id = strtoupper(preg_replace('/[^A-Za-z0-9]/', '', $projectName));
     $envGlobal = getEnvData();
 
-    $dbFields = ['DATABASE' => 'database', 'NAME' => 'database', 'USERNAME' => 'username', 'USER' => 'username', 'PASSWORD' => 'password', 'PASS' => 'password', 'HOST' => 'host'];
+    $dbFields = ['DB_HOST' => 'host', 'DB_NAME' => 'database', 'DB_USER' => 'username', 'DB_PASS' => 'password', 'DATABASE' => 'database', 'NAME' => 'database', 'USER' => 'username', 'PASS' => 'password', 'HOST' => 'host'];
     foreach ($dbFields as $suffix => $configKey) {
         $key = "PROJ_{$id}_{$suffix}";
         if (isset($envGlobal[$key]) && empty($config['db'][$configKey])) {
@@ -93,7 +93,7 @@ function get_project_full_config($projectName) {
         }
     }
     
-    $ftpFields = ['HOST' => 'host', 'USER' => 'user', 'PASS' => 'pass', 'ROOT' => 'root'];
+    $ftpFields = ['FTP_HOST' => 'host', 'FTP_USER' => 'user', 'FTP_PASS' => 'pass', 'FTP_ROOT' => 'root', 'HOST' => 'host', 'USER' => 'user', 'PASS' => 'pass', 'ROOT' => 'root'];
     foreach ($ftpFields as $suffix => $configKey) {
         $key = "PROJ_{$id}_{$suffix}";
         if (isset($envGlobal[$key]) && empty($config['ftp'][$configKey])) {
@@ -144,4 +144,65 @@ function should_exclude($name, $path, $excludeList) {
         if ($name === $ex || strpos($path, $ex) !== false) return true;
     }
     return false;
+}
+
+/**
+ * Persiste la configuración táctica de un proyecto en el .env global
+ */
+function save_project_tactical_config($projectName, $data) {
+    $envPath = __DIR__ . '/../.env';
+    $id = strtoupper(preg_replace('/[^A-Za-z0-9]/', '', $projectName));
+    
+    if (!file_exists($envPath)) @file_put_contents($envPath, "");
+    
+    $lines = file($envPath, FILE_IGNORE_NEW_LINES);
+    $newLines = [];
+    $foundKeys = [];
+    
+    $map = [
+        'ftp_host' => "PROJ_{$id}_FTP_HOST",
+        'ftp_user' => "PROJ_{$id}_FTP_USER",
+        'ftp_pass' => "PROJ_{$id}_FTP_PASS",
+        'ftp_root' => "PROJ_{$id}_FTP_ROOT",
+        'db_host'  => "PROJ_{$id}_DB_HOST",
+        'db_name'  => "PROJ_{$id}_DB_NAME",
+        'db_user'  => "PROJ_{$id}_DB_USER",
+        'db_pass'  => "PROJ_{$id}_DB_PASS",
+    ];
+
+    // Procesar líneas existentes
+    foreach ($lines as $line) {
+        $matched = false;
+        foreach ($map as $dataKey => $envKey) {
+            if (strpos(trim($line), $envKey . '=') === 0) {
+                $val = $data[$dataKey] ?? '';
+                // Cifrar contraseñas
+                if (strpos($envKey, '_PASS') !== false && !empty($val)) {
+                    $val = PeonVault::encrypt($val);
+                }
+                $newLines[] = "{$envKey}=\"{$val}\"";
+                $foundKeys[] = $envKey;
+                $matched = true;
+                break;
+            }
+        }
+        if (!$matched) $newLines[] = $line;
+    }
+
+    // Añadir llaves nuevas
+    foreach ($map as $dataKey => $envKey) {
+        if (!in_array($envKey, $foundKeys)) {
+            $val = $data[$dataKey] ?? '';
+            if (strpos($envKey, '_PASS') !== false && !empty($val)) {
+                $val = PeonVault::encrypt($val);
+            }
+            $newLines[] = "{$envKey}=\"{$val}\"";
+        }
+    }
+
+    if (@file_put_contents($envPath, implode("\n", $newLines))) {
+        return ['status' => 'success', 'message' => 'Configuración táctica guardada.'];
+    }
+    
+    return ['status' => 'error', 'message' => 'No se pudo escribir en el archivo .env'];
 }
