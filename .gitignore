@@ -1,0 +1,36 @@
+# ♟️ PEON PROTOCOL | VERSIÓN 6.0
+# Blindaje de Repositorio - No filtrar Inteligencia
+
+# [SISTEMA]
+.env
+.htaccess
+node_modules/
+dist/
+tmp/
+logs/
+*.log
+
+# [BÓVEDA TÁCTICA]
+# No subir credenciales ni caches de sesiones
+vault/
+auth_cache/
+*.sql
+*.zip
+*.tar.gz
+
+# [BACKUPS]
+# Ignorar recursivamente la carpeta de backups de nodos
+backups/
+**/BACKUP/
+
+# [INTELIGENCIA DINÁMICA]
+# Protegemos el "oro". El repositorio público solo debe tener las carpetas,
+# pero el contenido de las Skills se inyecta vía Sixlan.
+code/skills/**/*.md
+!code/skills/**/README.md
+
+# [OS FILES]
+.DS_Store
+Thumbs.db
+desktop.ini
+.antigravity/
